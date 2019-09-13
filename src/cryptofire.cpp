@@ -17,6 +17,11 @@ CryptoFire::CryptoFire(int keySize, int codeSize, QString key):
     }
 }
 
+QString CryptoFire::Get_Key()
+{
+    return _key;
+}
+
 void CryptoFire::Test()
 {
     std::cout << "Start Test\n";

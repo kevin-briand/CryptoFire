@@ -13,6 +13,7 @@ public:
     CryptoFire(int keySize = 50, int codeSize = 4, QString key = nullptr);
     bool Add_Encrypted_Key(QString name, QString password);
     bool Remove_Encrypted_Key(QString name);
+    QString Get_Key();
     void Test();
 
 public slots:
