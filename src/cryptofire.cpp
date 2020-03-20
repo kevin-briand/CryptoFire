@@ -96,7 +96,7 @@ bool CryptoFire::Add_Encrypted_Key(QString name, QString password)
 bool CryptoFire::Remove_Encrypted_Key(QString name)
 {
     for(int i=0;i<_EncryptedKeys.count();i++) {
-        if(_EncryptedKeys.contains(name)) {
+        if(_EncryptedKeys.at(i).contains(name)) {
             _EncryptedKeys.removeAt(i);
             return true;
         }
