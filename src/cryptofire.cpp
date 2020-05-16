@@ -25,7 +25,6 @@ QString CryptoFire::Get_Key()
 void CryptoFire::Test()
 {
     std::cout << "Start Test\n";
-
     std::cout << "Valid test key : " << Add_Encrypted_Key("test","Passwd") << "\n";
     std::cout << "fail test same name : " << Add_Encrypted_Key("test","Test2") << "\n";
     std::cout << "fail test password too short : " << Add_Encrypted_Key("test2","pas") << "\n";
@@ -233,7 +232,7 @@ QString CryptoFire::Encrypt_Key(QString password)
     //Génération du code
     int code[_codeSize];
     for(int i=0;i<_codeSize;i++) {
-        code[i] = password.at(0).unicode() % 3;
+        code[i] = password.at(i).unicode() % 3;
     }
 
     //Génération de la clé suivant code et password
