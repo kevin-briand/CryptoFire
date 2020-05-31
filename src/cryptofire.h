@@ -5,6 +5,7 @@
 #include <QTime>
 #include <QDebug>
 #include <iostream>
+#include <QCryptographicHash>
 
 class CryptoFire : public QObject
 {
@@ -23,6 +24,7 @@ public slots:
 signals:
     void Decrypted_Data(QString data);
     void Encrypted_Data(QString data);
+    void Encrypted_Data_To_Hexa(QByteArray data);
 
 private:
     void Generate_Key(int keySize);
