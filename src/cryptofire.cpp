@@ -28,11 +28,11 @@ QString CryptoFire::Get_Key()
 void CryptoFire::Test()
 {
     std::cout << "Start Test\n";
-    std::cout << "Valid test key : " << Add_Encrypted_Key("test","Passwd") << "\n";
+    std::cout << "Valid test key : " << Add_Encrypted_Key("test","Passwdhuihliuhzefz6") << "\n";
 
     std::cout << "fail test same name : " << Add_Encrypted_Key("test","Test2") << "\n";
     std::cout << "fail test password too short : " << Add_Encrypted_Key("test2","pas") << "\n";
-    std::cout << "Valid test key test2 : " << Add_Encrypted_Key("test2","rgreg156regregregfzesz") << "\n\n";
+    std::cout << "Valid test key test2 : " << Add_Encrypted_Key("test2","rgreghulihulilh156regregregfzesz") << "\n\n";
 
     std::cout << "Test encryption : \n";
     std::cout << "Text 'Ceci est un test' : \n\n";
@@ -232,10 +232,25 @@ QString CryptoFire::Encrypt_Key(QString password)
         return "Error : WebPassword is too short !";
     }
 
+    //Convertion password to sha256
+    password = QCryptographicHash::hash(password.toLatin1(),QCryptographicHash::Sha256).toHex();
+
     //Génération du code
     int code[_codeSize];
     for(int i=0;i<_codeSize;i++) {
-        code[i] = password.at(i).unicode() % 3;
+        code[i] = 0;
+    }
+
+    int split = password.count() / _codeSize;
+    int act = 0;
+    for(int i=0;i<password.count();i++) {
+        act++;
+        if(act > split)
+            act = 0;
+        code[i / split] += password.at(i).unicode();
+    }
+    for(int i=0;i<_codeSize;i++) {
+        code[i] = code[i] % 3;
     }
 
     //Génération de la clé suivant code et password
@@ -261,7 +276,7 @@ QString CryptoFire::Encrypt_Key(QString password)
         }
 
         //Modification de la valeur si supérieur à _charSize
-        if(tchar > _charSize) {
+        if(tchar > static_cast<unsigned int>(_charSize)) {
             tchar = tchar % _charSize;
         }
         ekey += QChar(tchar);
