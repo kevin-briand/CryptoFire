@@ -2,13 +2,16 @@
 
 //keySize : Défini la taille de la clé de cryptage
 //codeSize : défini la difficulté du cryptage basé sur le mot de passe, celui-ci doit être au minimum de la taille du codeSize
-CryptoFire::CryptoFire(int keySize, int codeSize, QString key):
+CryptoFire::CryptoFire(int keySize, int codeSize, int charFormat, QString key):
     _codeSize(codeSize)
 {
     if(codeSize <= 0) {
         qDebug() << "error : bad codeSize";
         return;
     }
+
+    _charSize = charFormat == UTF16 ? 65530 : 250;
+
     if(key == nullptr) {
         Generate_Key(keySize);
     }
@@ -128,25 +131,25 @@ void CryptoFire::Decrypt_Data(QString &data, QString name)
         {
             idk = 0;
         }
-        int t = data.at(i).unicode();
-        if(t == 251)//retour a '
+        long t = data.at(i).unicode();
+        if(t == _charSize + 1)//retour a '
         {
             t = 34;
         }
-        else if(t == 252)//retour a "
+        else if(t == _charSize + 2)//retour a "
         {
             t = 39;
         }
         t += k.at(idk).unicode();
         if(t < 0)
         {
-            t = t + 250;
+            t = t + _charSize;
         }
-        else if(t > 250)
+        else if(t > _charSize)
         {
-            t = t - 250;
+            t = t - _charSize;
         }
-        decrypt += QChar(t).toLatin1();
+        decrypt += QChar((int)t);
         idk++;
     }
 
@@ -178,25 +181,25 @@ void CryptoFire::Encrypt_Data(QString &data, QString name)
         {
             idk = 0;
         }
-        int t = data.at(i).unicode();
+        long t = data.at(i).unicode();
         t -= k.at(idk).unicode();
-        if(t > 250)
+        if(t > _charSize)
         {
-            t = t - 250;
+            t = t - _charSize;
         }
         else if(t < 0)
         {
-            t = t + 250;
+            t = t + _charSize;
         }
         if(t == 34)//si '
         {
-            t = 251;
+            t = _charSize + 1;
         }
         else if(t == 39)//ou "
         {
-            t = 252;
+            t = _charSize + 2;
         }
-        crypt += QChar(t).toLatin1();
+        crypt += QChar((int)t);
         idk++;
     }
 
@@ -214,7 +217,7 @@ void CryptoFire::Generate_Key(int keySize)
 
     for(int i = 0;i<keySize;i++)
     {
-        key.append(QChar(rand() % 250));
+        key.append(QChar(rand() % _charSize));
     }
     _key = key;
 }
@@ -257,9 +260,9 @@ QString CryptoFire::Encrypt_Key(QString password)
             return "EncryptPKEY : Code is corrupted ! key not encrypted !";
         }
 
-        //Modification de la valeur si supérieur à 250
-        if(tchar > 250) {
-            tchar = tchar % 250;
+        //Modification de la valeur si supérieur à _charSize
+        if(tchar > _charSize) {
+            tchar = tchar % _charSize;
         }
         ekey += QChar(tchar);
         intCode++;

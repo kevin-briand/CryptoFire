@@ -7,11 +7,16 @@
 #include <iostream>
 #include <QCryptographicHash>
 
+enum charFormat {
+    UTF8,
+    UTF16
+};
+
 class CryptoFire : public QObject
 {
     Q_OBJECT
 public:
-    CryptoFire(int keySize = 50, int codeSize = 4, QString key = nullptr);
+    CryptoFire(int keySize = 50, int codeSize = 4, int charFormat = UTF8, QString key = nullptr);
     bool Add_Encrypted_Key(QString name, QString password);
     bool Remove_Encrypted_Key(QString name);
     QString Get_Key();
@@ -33,6 +38,7 @@ private:
     QString _key;
     QStringList _EncryptedKeys;
     const int _codeSize;
+    int _charSize;
 
 };
 
