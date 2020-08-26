@@ -23,8 +23,7 @@ public:
     bool Remove_Encrypted_Key(QString name);
     QString Get_Key();
     void Test();
-    QString Key_To_SHA256(QString name) { return QCryptographicHash::hash(Get_Encrypted_Key(name).toLatin1(),QCryptographicHash::Sha256).toHex(); };
-    QString Get_Encrypted_Key(QString name);
+    QString Key_To_SHA256(QString name) { return QCryptographicHash::hash(Get_Encrypted_Key(name).toLatin1(),QCryptographicHash::Sha256).toHex(); };  
 
 public slots:
     void Decrypt_Data(QString &data, QString name);
@@ -36,7 +35,7 @@ signals:
     void Encrypted_Data_To_Hexa(QByteArray data);
 
 private:
-
+    QString Get_Encrypted_Key(QString name);
     void Generate_Key(int keySize);
     QString Encrypt_Key(QString password, QString key = nullptr);
 
