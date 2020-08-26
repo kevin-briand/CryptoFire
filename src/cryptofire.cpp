@@ -5,6 +5,8 @@
 CryptoFire::CryptoFire(int keySize, int codeSize, int charFormat, QString key):
     _codeSize(codeSize)
 {
+    srand(time(0));
+
     if(codeSize <= 0) {
         qDebug() << "error : bad codeSize";
         return;
@@ -12,7 +14,7 @@ CryptoFire::CryptoFire(int keySize, int codeSize, int charFormat, QString key):
 
     _charSize = charFormat == UTF16 ? 65530 : 250;
 
-    if(key == nullptr) {
+    if(key.isEmpty()) {
         Generate_Key(keySize);
     }
     else {
@@ -32,7 +34,7 @@ void CryptoFire::Test()
 
     std::cout << "fail test same name : " << Add_Encrypted_Key("test","Test2") << "\n";
     std::cout << "fail test password too short : " << Add_Encrypted_Key("test2","pas") << "\n";
-    std::cout << "Valid test key test2 : " << Add_Encrypted_Key("test2","rgreghulihulilh156regregregfzesz") << "\n\n";
+    std::cout << "Valid test key test2 : " << Add_Encrypted_Key("test2","rgreghulihulilh156regregregfze") << "\n\n";
 
     std::cout << "Test encryption : \n";
     std::cout << "Text 'Ceci est un test' : \n\n";
@@ -75,20 +77,29 @@ void CryptoFire::Test()
 
 //Création d'une nouvelle clé de cryptage ayant pour nom "name" et suivant le mot de passe "password"
 //le "password" doit être >= au codeSize
-bool CryptoFire::Add_Encrypted_Key(QString name, QString password)
+bool CryptoFire::Add_Encrypted_Key(QString name, QString password, QString key)
 {
     for(int i=0;i<_EncryptedKeys.count();i++) {
         if(_EncryptedKeys.at(i).contains(name)) {
-            return false;
+            throw sameName;
         }
     }
     if(password.count() < _codeSize) {
-        return false;
+        throw codeSize;
     }
 
-    QString result = Encrypt_Key(password);
+    if(key.isEmpty()) {
+        key = _key;
+    }
+
+    if(key.count() != _key.count()) {
+        throw badKey;
+    }
+
+
+    QString result = Encrypt_Key(password, key);
     if(result == nullptr) {
-        return false;
+        throw  unknown;
     }
 
     _EncryptedKeys.append(name + "|" + result);
@@ -225,11 +236,15 @@ void CryptoFire::Generate_Key(int keySize)
 //Génération d'une nouvelle clé suivant le mot de passe et la clé original
 //Clé privé non transmise, sera utilisé pour crypter/décrypter les données
 //Clé généré par le client et le serveur
-QString CryptoFire::Encrypt_Key(QString password)
+QString CryptoFire::Encrypt_Key(QString password, QString key)
 {
     //le mot de passe  doit être minimum de taille identique au "codeSize"
     if(password.count() < _codeSize) {
         return "Error : WebPassword is too short !";
+    }
+
+    if(key.isEmpty()) {
+        key = _key;
     }
 
     //Convertion password to sha256
@@ -257,19 +272,19 @@ QString CryptoFire::Encrypt_Key(QString password)
     QString ekey;
     int intCode = 0;
     int intPassword = 0;
-    for(int i = 0;i<_key.count();i++) {
+    for(int i = 0;i<key.count();i++) {
         unsigned int tchar = 0;
         if(code[intCode] == 0) {
-            tchar = static_cast<unsigned int>(_key.at(i).unicode() + password.at(intPassword).unicode());
+            tchar = static_cast<unsigned int>(key.at(i).unicode() + password.at(intPassword).unicode());
         }
         else if(code[intCode] == 1) {
-            tchar = static_cast<unsigned int>(_key.at(i).unicode() - password.at(intPassword).unicode());
+            tchar = static_cast<unsigned int>(key.at(i).unicode() - password.at(intPassword).unicode());
         }
         else if(code[intCode] == 2) {
-            tchar = static_cast<unsigned int>(_key.at(i).unicode() * password.at(intPassword).unicode());
+            tchar = static_cast<unsigned int>(key.at(i).unicode() * password.at(intPassword).unicode());
         }
         else if(code[intCode] == 3) {
-            tchar = static_cast<unsigned int>(_key.at(i).unicode() / password.at(intPassword).unicode());
+            tchar = static_cast<unsigned int>(key.at(i).unicode() / password.at(intPassword).unicode());
         }
         else {
             return "EncryptPKEY : Code is corrupted ! key not encrypted !";
@@ -290,10 +305,20 @@ QString CryptoFire::Encrypt_Key(QString password)
         }
     }
 
-    if(ekey.count() == _key.count()) {
+    if(ekey.count() == key.count()) {
         return ekey;
     }
     else {
         return nullptr;
     }
+}
+
+QString CryptoFire::Get_Encrypted_Key(QString name)
+{
+    for(int i=0;i<_EncryptedKeys.count();i++) {
+        if(_EncryptedKeys.at(i).split("|").first() == name) {
+            return _EncryptedKeys.at(i).split("|").last();
+        }
+    }
+    return QString("");
 }
