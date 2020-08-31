@@ -1,2 +1,7 @@
 *.pro.user
 build*
+
+# Lib
+Lib/.qmake.stash
+Lib/*.o
+Lib/moc_*

@@ -1,6 +1,8 @@
 QT -= gui
 
-CONFIG += c++11 console
+TEMPLATE = lib
+DEFINES += CRYPTOFIRE_LIBRARY
+CONFIG += c++11
 CONFIG -= app_bundle
 
 # The following define makes your compiler emit warnings if you use
@@ -19,9 +21,12 @@ SOURCES += \
         main.cpp
 
 # Default rules for deployment.
-qnx: target.path = /tmp/$${TARGET}/bin
-else: unix:!android: target.path = /opt/$${TARGET}/bin
+unix {
+    target.path = /usr/lib
+}
 !isEmpty(target.path): INSTALLS += target
 
+
 HEADERS += \
+    CryptoFire_global.h \
     cryptofire.h
