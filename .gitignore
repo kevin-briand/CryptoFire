@@ -2,6 +2,6 @@
 build*
 
 # Lib
-Lib/.qmake.stash
-Lib/*.o
-Lib/moc_*
+.qmake.stash
+*.o
+moc_*
