@@ -12,7 +12,7 @@ CryptoFire::CryptoFire(int keySize, int codeSize, int charFormat, QString key):
         return;
     }
 
-    _charSize = charFormat == UTF16 ? 65530 : 250;
+    _charSize = charFormat == UTF16 ? 43000 : 250;
 
     if(key.isEmpty()) {
         Generate_Key(keySize);
@@ -160,6 +160,7 @@ void CryptoFire::Decrypt_Data(QString &data, QString name)
         {
             t = t - _charSize;
         }
+        qDebug() << "Key :" << k.at(idk).unicode() << " original : " << data.at(i).unicode() << " result : " << t;
         decrypt += QChar((int)t);
         idk++;
     }
@@ -210,6 +211,7 @@ void CryptoFire::Encrypt_Data(QString &data, QString name)
         {
             t = _charSize + 2;
         }
+        qDebug() << "Key :" << k.at(idk).unicode() << " original : " << data.at(i).unicode() << " result : " << t;
         crypt += QChar((int)t);
         idk++;
     }
@@ -268,6 +270,11 @@ QString CryptoFire::Encrypt_Key(QString password, QString key)
         code[i] = code[i] % 3;
     }
 
+    QString codevalue;
+    for(int i=0;i<_codeSize;i++)
+        codevalue.append(code[i]);
+    qDebug() << "Generate key - Code : " << codevalue;
+
     //Génération de la clé suivant code et password
     QString ekey;
     int intCode = 0;
@@ -294,6 +301,9 @@ QString CryptoFire::Encrypt_Key(QString password, QString key)
         if(tchar > static_cast<unsigned int>(_charSize)) {
             tchar = tchar % _charSize;
         }
+
+        qDebug() << "Generate key - original : " << key.at(i).unicode() << " result : " << tchar;
+
         ekey += QChar(tchar);
         intCode++;
         if(intCode >= _codeSize) {

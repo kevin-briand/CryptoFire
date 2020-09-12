@@ -4,6 +4,9 @@ TEMPLATE = lib
 DEFINES += CRYPTOFIRE_LIBRARY
 CONFIG += c++11
 CONFIG -= app_bundle
+VERSION = 1.0.1
+
+CONFIG(release, debug|release):DEFINES += QT_NO_DEBUG_OUTPUT
 
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings
