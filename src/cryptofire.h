@@ -7,6 +7,7 @@
 #include <iostream>
 #include <QCryptographicHash>
 #include <stdexcept>
+#include <QTextCodec>
 
 enum charFormat {
     UTF8,
@@ -23,7 +24,11 @@ public:
     bool Remove_Encrypted_Key(QString name);
     QString Get_Key();
     void Test();
-    QString Key_To_SHA256(QString name) { return QCryptographicHash::hash(Get_Encrypted_Key(name).toLatin1(),QCryptographicHash::Sha256).toHex(); };  
+    QString Key_To_SHA256(QString name) { QTextCodec *codec = QTextCodec::codecForName("UTF-8");
+                                          QByteArray ba = codec->fromUnicode(Get_Encrypted_Key(name));
+                                          ba = codec->fromUnicode(Get_Encrypted_Key(name));
+        qDebug() << "UTF-8" <<  QCryptographicHash::hash(ba,QCryptographicHash::Sha256).toHex();
+                                          return QCryptographicHash::hash(ba,QCryptographicHash::Sha256).toHex(); };
 
 public slots:
     void Decrypt_Data(QString &data, QString name);

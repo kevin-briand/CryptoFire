@@ -12,6 +12,8 @@ CryptoFire::CryptoFire(int keySize, int codeSize, int charFormat, QString key):
         return;
     }
 
+    qDebug() << "Test hash : " << QCryptographicHash::hash("zefjio('zefjioézarfdgkçtrgej",QCryptographicHash::Sha256).toHex();
+
     _charSize = charFormat == UTF16 ? 43000 : 250;
 
     if(key.isEmpty()) {
@@ -103,6 +105,7 @@ bool CryptoFire::Add_Encrypted_Key(QString name, QString password, QString key)
     }
 
     _EncryptedKeys.append(name + "|" + result);
+    qDebug() << "Key to hex(" + name + ") : " + Key_To_SHA256(name);
     return true;
 }
 
@@ -160,7 +163,7 @@ void CryptoFire::Decrypt_Data(QString &data, QString name)
         {
             t = t - _charSize;
         }
-        qDebug() << "Key :" << k.at(idk).unicode() << " original : " << data.at(i).unicode() << " result : " << t;
+        //qDebug() << "Key :" << k.at(idk).unicode() << " original : " << data.at(i).unicode() << " result : " << t;
         decrypt += QChar((int)t);
         idk++;
     }
@@ -211,7 +214,7 @@ void CryptoFire::Encrypt_Data(QString &data, QString name)
         {
             t = _charSize + 2;
         }
-        qDebug() << "Key :" << k.at(idk).unicode() << " original : " << data.at(i).unicode() << " result : " << t;
+        //qDebug() << "Key :" << k.at(idk).unicode() << " original : " << data.at(i).unicode() << " result : " << t;
         crypt += QChar((int)t);
         idk++;
     }
@@ -251,6 +254,7 @@ QString CryptoFire::Encrypt_Key(QString password, QString key)
 
     //Convertion password to sha256
     password = QCryptographicHash::hash(password.toLatin1(),QCryptographicHash::Sha256).toHex();
+    qDebug() << "Password hashed to hex : " << password;
 
     //Génération du code
     int code[_codeSize];
@@ -302,7 +306,7 @@ QString CryptoFire::Encrypt_Key(QString password, QString key)
             tchar = tchar % _charSize;
         }
 
-        qDebug() << "Generate key - original : " << key.at(i).unicode() << " result : " << tchar;
+        //qDebug() << "Generate key - original : " << key.at(i).unicode() << " result : " << tchar;
 
         ekey += QChar(tchar);
         intCode++;
